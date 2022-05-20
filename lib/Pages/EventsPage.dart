@@ -32,7 +32,7 @@ class EventsPage extends StatelessWidget {
                       (BuildContext context, int index) {
                     return const EventCard();
                   },
-                  childCount: 10,
+                  childCount: 1,
                 ),
               ),
             )
