@@ -12,13 +12,18 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+      ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         child: Column(
           children: [
+            Row(
+              children: [
+                Text("Helloword")
+              ],
+            ),
             Row(),
-            Row(),
-
           ],
         ),
       ),
