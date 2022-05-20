@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:e_game/widgets/GameCard.dart';
 
-
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -13,19 +12,26 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color(0xff0e182b),
+        fixedColor: Colors.white,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        ],
+      ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 15, right: 15, top: 70),
+        padding: const EdgeInsets.only(left: 15, right: 15, top: 60),
         physics: const BouncingScrollPhysics(),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                CircleAvatar(
+                const CircleAvatar(
                   radius: 22,
-                  backgroundColor: Colors.brown.shade800,
-                  child: const Text('S'),
+                  backgroundColor: Color(0xff182a4c),
+                  child: Text('S'),
                 ),
                 Container(
                   margin: const EdgeInsets.only(left: 10),
@@ -46,14 +52,13 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(
                   fontSize: 30,
                   color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            GameCard(),
-            GameCard(),
-            GameCard(),
-            GameCard(),
-            GameCard(),
+            const GameCard(name: "BattleGround", imageUrl: "assets/images/pubg.jpg",),
+            const GameCard(name: "FreeFire", imageUrl: "assets/images/freeFire.jpg",),
+            const GameCard(name: "Call of Duty", imageUrl: "assets/images/cod.jpg",),
           ],
         ),
       ),

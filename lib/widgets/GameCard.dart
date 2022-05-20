@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
-
+import 'package:e_game/Pages/EventsPage.dart';
 class GameCard extends StatelessWidget {
-  const GameCard({Key? key}) : super(key: key);
+  final String name;
+  final String imageUrl;
+  const GameCard({required this.name, required this.imageUrl, Key? key}) : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 200,
-      padding: EdgeInsets.all(20),
-      margin: EdgeInsets.only(top: 10, bottom: 10),
-      width: double.infinity,
-      decoration: BoxDecoration(
-        image: const DecorationImage(
-          image: NetworkImage("https://wallpapercave.com/wp/wp5350825.jpg"),
-          fit: BoxFit.cover
+    return GestureDetector(
+      onTap: () => {
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(name: "$name Events", imageUrl: imageUrl,)))
+      },
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        height: 200,
+        // padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.only(top: 10, bottom: 10),
+        width: double.infinity,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
         ),
-        borderRadius: BorderRadius.circular(15)
-      ),
-      child: const Text(
-        "BattleGround",
-        style: TextStyle(
-          color: Colors.black,
-          fontSize: 20,
-          fontStyle: FontStyle.italic,
-          fontWeight: FontWeight.bold,
-        ),
+        child: Hero(
+          tag: "$name Events",
+          child: Image.asset(imageUrl, fit: BoxFit.cover,),
+        )
       ),
     );
   }
