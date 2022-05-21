@@ -1,42 +1,82 @@
+import 'package:e_game/modals/Event.dart';
+import 'package:e_game/providers/pubgProvider.dart';
 import 'package:e_game/widgets/EventsCard.dart';
-import 'package:e_game/widgets/GameCard.dart';
 import 'package:flutter/material.dart';
 
-class EventsPage extends StatelessWidget {
+import 'package:provider/provider.dart';
+
+class EventsPage extends StatefulWidget {
   final String imageUrl;
   final String name;
-  const EventsPage({required this.imageUrl, required this.name,  Key? key}) : super(key: key);
+  const EventsPage({required this.imageUrl, required this.name, Key? key})
+      : super(key: key);
+
+  @override
+  State<EventsPage> createState() => _EventsPageState();
+}
+
+class _EventsPageState extends State<EventsPage> {
+  bool _isLoading = true;
+
+  @override
+  void didChangeDependencies() {
+    //if this page is loaded we fetch event list from firebase
+    Provider.of<PubgProvider>(context).fetchEventList().then((value) {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
+    List<Event> _eList = Provider.of<PubgProvider>(context).eventList;
     return Scaffold(
-        body: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            SliverAppBar(
-              pinned: true,
-              backgroundColor: const Color(0xff0e182b),
-              expandedHeight: 170,
-              flexibleSpace: FlexibleSpaceBar(
-                title: Text(name, style: const TextStyle(fontSize: 15),),
-                background: Hero(
-                  tag: name,
-                  child: Image.asset(imageUrl, fit: BoxFit.cover, color: Colors.white.withOpacity(0.6), colorBlendMode: BlendMode.modulate),
-                )
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            backgroundColor: const Color(0xff0e182b),
+            expandedHeight: 170,
+            title: Text(
+              widget.name,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            SliverPadding(
-              padding: const EdgeInsets.all(15),
-              sliver: SliverList(
-                delegate: SliverChildBuilderDelegate(
-                      (BuildContext context, int index) {
-                    return const EventCard();
-                  },
-                  childCount: 1,
-                ),
+            flexibleSpace: FlexibleSpaceBar(
+              background: Hero(
+                tag: widget.name,
+                child: Image.asset(widget.imageUrl,
+                    fit: BoxFit.cover,
+                    color: Colors.white.withOpacity(0.5),
+                    colorBlendMode: BlendMode.modulate),
               ),
-            )
-          ],
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.all(15),
+            sliver: _isLoading
+                ? const SliverFillRemaining(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
+                : SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        return EventCard(
+                          eventId: _eList[index].eventId,
+                        );
+                      },
+                      childCount: _eList.length,
+                    ),
+                  ),
+          )
+        ],
       ),
     );
   }

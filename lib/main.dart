@@ -1,8 +1,14 @@
 import 'package:e_game/Pages/HomePage.dart';
+import 'package:e_game/providers/pubgProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import './Pages/HomePage.dart';
 
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -12,24 +18,19 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primaryColor: Colors.purpleAccent,
-        scaffoldBackgroundColor: Color(0xff050910),
-
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => PubgProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primaryColor: Colors.purpleAccent,
+          scaffoldBackgroundColor: Color(0xff050910),
+        ),
+        home: const HomePage(),
       ),
-      home: const HomePage(),
     );
   }
 }
