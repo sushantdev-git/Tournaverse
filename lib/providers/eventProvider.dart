@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:e_game/providers/authProvider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:e_game/modals/Event.dart';
 import 'package:http/http.dart' as http;
@@ -7,12 +8,10 @@ import 'package:http/http.dart' as http;
 class EventProvider extends ChangeNotifier {
   List<Event> eventList = [];
 
-  Future<void> fetchEventList() async {
+  Future<void> fetchEventList(AuthProvider authProvider) async {
 
-    print("function called");
-    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IklzaGFudCIsImlhdCI6MTY1MzQxODc1OSwiZXhwIjoxNjUzNDE5OTU5fQ.HEE62J0CmWfnCSopbWSARGVNidmcLtlfMso3OfR5eJA";
     try{
-      var pubgEvents = await http.get(Uri.parse("https://e-sports-game.herokuapp.com/events/pubgEvents"), headers: {'Authorization': 'Bearer $token'});
+      var pubgEvents = await http.get(Uri.parse("https://e-sports-game.herokuapp.com/events/pubgEvents"), headers: {'Authorization': 'Bearer ${authProvider.accessToken}'});
 
       List<dynamic> data = jsonDecode(pubgEvents.body);
 
@@ -39,6 +38,7 @@ class EventProvider extends ChangeNotifier {
       eventList = eList;
     }
     catch (e){
+      print("error occurred.");
       print(e);
     }
   }

@@ -31,7 +31,7 @@ class EventDetail extends StatelessWidget {
         ),
         TextAndIcon(
           icon: Icons.person,
-          text: "Users Registered - ${event.userRegistered}/${event.totalSlots}",
+          text: "Users Registered - ${event.userRegistered.length}/${event.totalSlots}",
         ),
         TextAndIcon(
           icon: Icons.calendar_today,
@@ -43,7 +43,7 @@ class EventDetail extends StatelessWidget {
         ),
         TextAndIcon(
           icon: Icons.monetization_on,
-          text: "Winning Amount - ₹${(60*(event.userRegistered*event.entryFee)/100)}",
+          text: "Winning Amount - ₹${(60*(event.userRegistered.length*event.entryFee)/100)}",
         ),
         const TextAndIcon(
           icon: Icons.calendar_view_day_sharp,

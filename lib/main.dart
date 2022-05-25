@@ -1,6 +1,7 @@
 import 'package:e_game/Pages/HomePage.dart';
 import 'package:e_game/Pages/LoginPage.dart';
 import 'package:e_game/konstants/ThemeConstants.dart';
+import 'package:e_game/providers/authProvider.dart';
 import 'package:e_game/providers/eventProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +27,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => EventProvider()),
+        ChangeNotifierProvider(create: (context) => AuthProvider())
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -39,8 +41,19 @@ class MyApp extends StatelessWidget {
             )
           )
         ),
-        home: const LoginPage(),
+        home: const ChildSelector(),
       ),
     );
+  }
+}
+
+
+class ChildSelector extends StatelessWidget {
+  const ChildSelector({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    return authProvider.accessToken == null ? const LoginPage() : const HomePage();
   }
 }

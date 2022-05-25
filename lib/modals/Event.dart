@@ -6,7 +6,7 @@ class Event {
   final String gameMap;
   final String gameMode;
   final int totalSlots;
-  final int userRegistered;
+  final List<dynamic> userRegistered;
   final String imageUrl;
   final String eventId;
 

@@ -1,4 +1,5 @@
 import 'package:e_game/modals/Event.dart';
+import 'package:e_game/providers/authProvider.dart';
 import 'package:e_game/providers/eventProvider.dart';
 import 'package:e_game/widgets/EventsCard.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,8 @@ class _EventsPageState extends State<EventsPage> {
   @override
   void didChangeDependencies() {
     //if this page is loaded we fetch event list from firebase
-    Provider.of<EventProvider>(context).fetchEventList().then((value) {
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
+    Provider.of<EventProvider>(context).fetchEventList(authProvider).then((value) {
       setState(() {
         _isLoading = false;
       });

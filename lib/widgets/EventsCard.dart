@@ -59,7 +59,7 @@ class EventCard extends StatelessWidget {
                         fontWeight: FontWeight.bold),
                   ),
                   TextAndIcon(icon: Icons.access_time_outlined, text: f.format(event.eventTime)),
-                  TextAndIcon(icon: Icons.person_rounded, text: "${event.userRegistered}/${event.totalSlots}"),
+                  TextAndIcon(icon: Icons.person_rounded, text: "${event.userRegistered.length}/${event.totalSlots}"),
                   TextAndIcon(icon: Icons.attach_money_outlined, text: "Entry Fee - ₹${event.entryFee}")
                 ],
               ),

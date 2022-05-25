@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:e_game/konstants/ThemeConstants.dart';
+import 'package:e_game/providers/authProvider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -9,106 +13,238 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
   bool login = true;
+  final String loginText = "Let's\nLog you in. ❤ ";
+  final String registerText = "Go ahead,\nCreate an account. ✌ ";
+  String displayText = "Let's\nLog you in. ❤";
+
+  String name = "";
+  String email = "";
+  String phoneNo = "";
+  String password = "";
+  bool isLoggingOrRegistering = false;
+
+  final _form = GlobalKey<FormState>();
+
+  changeText() async {
+    int sz = login ? loginText.length : registerText.length;
+    int ind = 0;
+    String text;
+
+    while (ind <= sz) {
+      text =
+          login ? loginText.substring(0, ind) : registerText.substring(0, ind);
+      await Future.delayed(const Duration(milliseconds: 100));
+      setState(() {
+        displayText = text;
+      });
+      ind++;
+    }
+  }
+
+  //validators
+  String? mobileNoValidator(String? no) {
+    if (no == null) return "Enter you Phone no";
+    if (no.length < 10 || no.length > 10) return "Phone no must have length 10";
+    RegExp regExp = RegExp(r"^[6-9]\d{9}$");
+    if (!regExp.hasMatch(no)) return "Enter Phone no in valid format";
+    return null;
+  }
+
+  String? emailValidator(String? email) {
+    if (email == null) return "Enter you email";
+    RegExp regExp = RegExp(r"^[^\s@]+@[^\s@]+\.[^\s@]+$");
+    if (!regExp.hasMatch(email)) return "Enter a valid email address";
+    return null;
+  }
+
+  String? passwordValidator(String? password) {
+    if (password == null) return "Enter you password";
+    if (password.length < 8) return "Minimum password length is 8";
+    RegExp regExp = RegExp(
+        r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$");
+    if (!regExp.hasMatch(password))
+      return "Password must contain one number,\none letter and one special character";
+    return null;
+  }
+
+  Future<void> handleLogin(AuthProvider auth) async {
+    setState(() {
+      isLoggingOrRegistering = true;
+    });
+
+    print(email);
+
+    await auth.login(email, password);
+
+    setState(() {
+      isLoggingOrRegistering = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    Size _mediaQuery = MediaQuery.of(context).size;
+    Size mediaQuery = MediaQuery.of(context).size;
+    AuthProvider authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
         padding: EdgeInsets.all(20),
         child: Container(
-          height: _mediaQuery.height ,
+          height: mediaQuery.height,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                login ? "Let's\nLog you in. 💜" : "Let's\nCreate an account. 💜",
+                displayText,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 60,
+                  fontSize: 55,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(
                 height: 60,
               ),
-              if (!login) ...[
-                TextField(
-                  style: whiteTextTheme,
-                  cursorColor: Colors.white,
-                  decoration: getInputDecoration("Enter you name"),
+              Form(
+                key: _form,
+                child: Column(
+                  children: [
+                    if (!login) ...[
+                      TextFormField(
+                        style: whiteTextTheme,
+                        cursorColor: Colors.white,
+                        decoration: getInputDecoration("Enter you name"),
+                        onChanged: (val) {
+                          name = val;
+                        },
+                        validator: (name) {
+                          if (name == null) return "Enter you name";
+                          name = name.trim();
+                          if (name.length < 4) return "Enter a valid name";
+                          return null;
+                        },
+                        initialValue: name,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      TextFormField(
+                        style: whiteTextTheme,
+                        cursorColor: Colors.white,
+                        decoration: getInputDecoration("Enter you mobile no"),
+                        onChanged: (val) {
+                          phoneNo = val;
+                        },
+                        validator: mobileNoValidator,
+                        keyboardType: TextInputType.phone,
+                        initialValue: phoneNo,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                    ],
+                    TextFormField(
+                      style: whiteTextTheme,
+                      cursorColor: Colors.white,
+                      decoration: getInputDecoration("Enter you email"),
+                      keyboardType: TextInputType.emailAddress,
+                      onChanged: (val) {
+                        email = val;
+                      },
+                      validator: emailValidator,
+                      initialValue: email,
+                    ),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    TextFormField(
+                      style: whiteTextTheme,
+                      cursorColor: Colors.white,
+                      decoration: getInputDecoration("Enter you password"),
+                      onChanged: (val) {
+                        password = val;
+                      },
+                      validator: passwordValidator,
+                      initialValue: password,
+                      obscureText: true,
+                      keyboardType: TextInputType.visiblePassword,
+                    ),
+                  ],
                 ),
-                const SizedBox(
-                  height: 20,
-                ),
-                TextField(
-                  style: whiteTextTheme,
-                  cursorColor: Colors.white,
-                  decoration: getInputDecoration("Enter you mobile no"),
-                ),
-                const SizedBox(
-                  height: 20,
-                ),
-              ],
-              TextField(
-                style: whiteTextTheme,
-                cursorColor: Colors.white,
-                decoration: getInputDecoration("Enter you email"),
-              ),
-              const SizedBox(
-                height: 20,
-              ),
-              TextField(
-                style: whiteTextTheme,
-                cursorColor: Colors.white,
-                decoration: getInputDecoration("Enter you password"),
               ),
               const SizedBox(
                 height: 60,
               ),
-              ElevatedButton(
-                onPressed: () => {},
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: Center(
-                    child: Text( login ? "Login" : "Register" ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: Center(
-                  child: TextButton(
-                    onPressed: () => {
-                      setState(() {
-                        login = !login;
-                      })
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          login ? "Don't have an account ? " : "Have an account ? ",
-                          style: const TextStyle(color: Colors.white60),
-                        ),
-                        Text(
-                          login ? "Register" : "Login",
-                          style: const TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.bold),
-                        )
-                      ],
+              if (isLoggingOrRegistering) ...[
+                const Center(
+                  child: CircularProgressIndicator(),
+                )
+              ] else ...[
+                ElevatedButton(
+                  onPressed: () => {
+                    if (_form.currentState!.validate())
+                      {
+                        if (login) handleLogin(authProvider),
+                      }
+                  },
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: Center(
+                      child: Text(login ? "Login" : "Register"),
                     ),
                   ),
                 ),
-              )
+                SizedBox(
+                  height: 10,
+                ),
+                if (authProvider.error != null)
+                  Center(
+                    child: Text(
+                      authProvider.error.toString(),
+                      style: TextStyle(
+                          color: Colors.redAccent, fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                SizedBox(
+                  width: double.infinity,
+                  child: Center(
+                    child: TextButton(
+                      onPressed: () => {
+                        setState(() {
+                          login = !login;
+                        }),
+                        changeText()
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            login
+                                ? "Don't have an account ? "
+                                : "Have an account ? ",
+                            style: const TextStyle(color: Colors.white60),
+                          ),
+                          Text(
+                            login ? "Register" : "Login",
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              ]
             ],
           ),
-        )
+        ),
       ),
     );
   }
