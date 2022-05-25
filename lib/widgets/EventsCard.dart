@@ -1,5 +1,5 @@
 import 'package:e_game/Pages/EventDetailsPage.dart';
-import 'package:e_game/providers/pubgProvider.dart';
+import 'package:e_game/providers/eventProvider.dart';
 import 'package:e_game/widgets/TextAndIcon.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -13,7 +13,7 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final f = DateFormat('dd MMM yyyy, hh:mm a');
-    Event event = Provider.of<PubgProvider>(context).getEventById(eventId);
+    Event event = Provider.of<EventProvider>(context).getEventById(eventId);
     return GestureDetector(
       onTap: () => {
         Navigator.of(context).push(

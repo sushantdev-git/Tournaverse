@@ -3,7 +3,7 @@ import 'package:e_game/widgets/GameRules.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/pubgProvider.dart';
+import '../providers/eventProvider.dart';
 import 'package:e_game/modals/Event.dart';
 
 class EventsDetailsPage extends StatefulWidget {
@@ -18,7 +18,7 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
   @override
   Widget build(BuildContext context) {
     Event event =
-        Provider.of<PubgProvider>(context).getEventById(widget.eventId);
+        Provider.of<EventProvider>(context).getEventById(widget.eventId);
     return DefaultTabController(
       length: 3,
       child: Scaffold(

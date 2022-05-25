@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:e_game/modals/Event.dart';
 
-import '../providers/pubgProvider.dart';
+import '../providers/eventProvider.dart';
 
 class EventDetail extends StatelessWidget {
   final String eventId;
@@ -13,7 +13,7 @@ class EventDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final f = DateFormat('dd MMM yyyy, hh:mm a');
-    Event event = Provider.of<PubgProvider>(context).getEventById(eventId);
+    Event event = Provider.of<EventProvider>(context).getEventById(eventId);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[

@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:e_game/modals/Event.dart';
 import 'package:http/http.dart' as http;
 
-class PubgProvider extends ChangeNotifier {
+class EventProvider extends ChangeNotifier {
   List<Event> eventList = [];
 
   Future<void> fetchEventList() async {

@@ -1,14 +1,15 @@
 import 'package:e_game/Pages/HomePage.dart';
-import 'package:e_game/providers/pubgProvider.dart';
+import 'package:e_game/Pages/LoginPage.dart';
+import 'package:e_game/konstants/ThemeConstants.dart';
+import 'package:e_game/providers/eventProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import './Pages/HomePage.dart';
 
-import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+
   runApp(const MyApp());
 }
 
@@ -18,18 +19,27 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => PubgProvider()),
+        ChangeNotifierProvider(create: (context) => EventProvider()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         theme: ThemeData(
           primaryColor: Colors.purpleAccent,
-          scaffoldBackgroundColor: Color(0xff050910),
+          scaffoldBackgroundColor: scaffoldColor,
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ElevatedButton.styleFrom(
+              primary: primaryColor,
+            )
+          )
         ),
-        home: const HomePage(),
+        home: const LoginPage(),
       ),
     );
   }
