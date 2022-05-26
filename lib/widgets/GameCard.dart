@@ -1,16 +1,18 @@
+import 'package:e_game/konstants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:e_game/Pages/EventsPage.dart';
 class GameCard extends StatelessWidget {
   final String name;
   final String imageUrl;
-  const GameCard({required this.name, required this.imageUrl, Key? key}) : super(key: key);
+  final GameType gType;
+  const GameCard({required this.name, required this.imageUrl, required this.gType, Key? key}) : super(key: key);
 
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(name: "$name Events", imageUrl: imageUrl,)))
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(name: "$name Events", imageUrl: imageUrl, gType: gType,)))
       },
       child: Container(
         clipBehavior: Clip.antiAlias,

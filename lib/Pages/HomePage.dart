@@ -1,3 +1,4 @@
+import 'package:e_game/konstants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:e_game/widgets/GameCard.dart';
 
@@ -56,9 +57,9 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            const GameCard(name: "BattleGround", imageUrl: "assets/images/pubg.jpg",),
-            const GameCard(name: "FreeFire", imageUrl: "assets/images/freeFire.jpg",),
-            const GameCard(name: "Call of Duty", imageUrl: "assets/images/cod.jpg",),
+            const GameCard(name: "BattleGround", imageUrl: "assets/images/pubg.jpg", gType: GameType.battlegound,),
+            const GameCard(name: "FreeFire", imageUrl: "assets/images/freeFire.jpg", gType: GameType.freefire,),
+            const GameCard(name: "Call of Duty", imageUrl: "assets/images/cod.jpg", gType: GameType.cod,),
           ],
         ),
       ),

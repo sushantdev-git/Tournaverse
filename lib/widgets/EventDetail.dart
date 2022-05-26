@@ -1,3 +1,4 @@
+import 'package:e_game/konstants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:e_game/widgets/TextAndIcon.dart';
 import 'package:intl/intl.dart';
@@ -8,12 +9,13 @@ import '../providers/eventProvider.dart';
 
 class EventDetail extends StatelessWidget {
   final String eventId;
-  const EventDetail({required this.eventId, Key? key}) : super(key: key);
+  final GameType gType;
+  const EventDetail({required this.eventId, required this.gType, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final f = DateFormat('dd MMM yyyy, hh:mm a');
-    Event event = Provider.of<EventProvider>(context).getEventById(eventId);
+    Event event = Provider.of<EventProvider>(context).getEventById(eventId,gType);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[

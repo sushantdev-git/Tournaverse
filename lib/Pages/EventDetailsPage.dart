@@ -1,4 +1,4 @@
-import 'package:e_game/konstants/ThemeConstants.dart';
+import 'package:e_game/konstants/constants.dart';
 import 'package:e_game/widgets/EventDetail.dart';
 import 'package:e_game/widgets/GameRules.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +9,8 @@ import 'package:e_game/modals/Event.dart';
 
 class EventsDetailsPage extends StatefulWidget {
   final String eventId;
-  const EventsDetailsPage({required this.eventId, Key? key}) : super(key: key);
+  final GameType gType;
+  const EventsDetailsPage({required this.eventId, required this.gType, Key? key}) : super(key: key);
 
   @override
   State<EventsDetailsPage> createState() => _EventsDetailsPageState();
@@ -19,8 +20,8 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
   @override
   Widget build(BuildContext context) {
     Event event =
-        Provider.of<EventProvider>(context).getEventById(widget.eventId);
-    List<String> _tabName = ["Details", "Rules", "Updates"];
+        Provider.of<EventProvider>(context).getEventById(widget.eventId, widget.gType);
+    List<String> tabName = ["Details", "Rules", "Updates"];
 
     return DefaultTabController(
       length: 3,
@@ -67,7 +68,7 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
             ];
           },
           body: TabBarView(
-            children: _tabName.map((name) {
+            children: tabName.map((name) {
               return SafeArea(
                 top: false,
                 bottom: false,
@@ -75,7 +76,7 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
                   builder: (context) {
                     return CustomScrollView(
                       key: PageStorageKey<String>(name),
-                      physics: BouncingScrollPhysics(),
+                      physics: const BouncingScrollPhysics(),
                       slivers: [
                         SliverOverlapInjector(
                           handle:
@@ -88,7 +89,7 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
                             itemExtent: name == "Details" ? 500 : name == "Rules" ? 1600 : 1600,
                             delegate: SliverChildListDelegate(
                               [
-                                if(name == "Details") EventDetail(eventId: widget.eventId),
+                                if(name == "Details") EventDetail(eventId: widget.eventId,gType: widget.gType,),
                                 if(name == "Rules") const GameRules(),
                                 if(name == "Updates") const GameRules()
                               ]
