@@ -11,14 +11,20 @@ class EventProvider extends ChangeNotifier {
   Future<void> fetchEventList(AuthProvider authProvider) async {
 
     try{
-      var pubgEvents = await http.get(Uri.parse("https://e-sports-game.herokuapp.com/events/pubgEvents"), headers: {'Authorization': 'Bearer ${authProvider.accessToken}'});
+      var response = await http.get(Uri.parse("https://e-sports-game.herokuapp.com/events/pubgEvents"), headers: {'Authorization': 'Bearer ${authProvider.accessToken}'});
 
-      List<dynamic> data = jsonDecode(pubgEvents.body);
+      if(response.statusCode == 403){ //refreshing access Token;
+        if(await authProvider.fetchAccessToken()){
+          //if we were able to fetch access token then we will again fetch the request.
+          return await fetchEventList(authProvider);
+        }
+      }
+
+      List<dynamic> data = jsonDecode(response.body);
 
       List<Event> eList = [];
 
       for(var event in data){
-        print(event);
         Event newEvent =  Event(
             eventId: event["_id"],
             entryFee: event["entryFee"],
@@ -34,11 +40,9 @@ class EventProvider extends ChangeNotifier {
         eList.add(newEvent);
       }
 
-      print(eList.length);
       eventList = eList;
     }
     catch (e){
-      print("error occurred.");
       print(e);
     }
   }

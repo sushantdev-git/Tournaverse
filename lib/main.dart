@@ -10,7 +10,10 @@ import './Pages/HomePage.dart';
 
 
 void main() async {
-
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   runApp(const MyApp());
 }
 
@@ -20,10 +23,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => EventProvider()),
@@ -51,9 +50,25 @@ class MyApp extends StatelessWidget {
 class ChildSelector extends StatelessWidget {
   const ChildSelector({Key? key}) : super(key: key);
 
+  Future<void> autoAuthorize(AuthProvider authProvider) async {
+    if(authProvider.fetchingApi) return;
+    print("auto auth 1");
+    if(authProvider.accessToken != null) return;
+    print("auto auth 2");
+    if(await authProvider.haveRefreshToken()){
+      print("auto auth 3");
+      await authProvider.fetchAccessToken();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
-    return authProvider.accessToken == null ? const LoginPage() : const HomePage();
+    return FutureBuilder(
+        future: autoAuthorize(authProvider),
+        builder: (context, snapshot) {
+          return authProvider.accessToken != null ? const HomePage() : const LoginPage();
+        }
+    );
   }
 }

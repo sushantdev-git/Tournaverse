@@ -13,7 +13,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   bool login = true;
   final String loginText = "Let's\nLog you in. ❤ ";
   final String registerText = "Go ahead,\nCreate an account. ✌ ";
@@ -23,11 +22,13 @@ class _LoginPageState extends State<LoginPage> {
   String email = "";
   String phoneNo = "";
   String password = "";
-  bool isLoggingOrRegistering = false;
+  bool changingText = false;
 
   final _form = GlobalKey<FormState>();
 
   changeText() async {
+
+    changingText = true;
     int sz = login ? loginText.length : registerText.length;
     int ind = 0;
     String text;
@@ -41,10 +42,12 @@ class _LoginPageState extends State<LoginPage> {
       });
       ind++;
     }
+
+    changingText = false;
   }
 
   //validators
-  String? mobileNoValidator(String? no) {
+  String? phoneNoValidator(String? no) {
     if (no == null) return "Enter you Phone no";
     if (no.length < 10 || no.length > 10) return "Phone no must have length 10";
     RegExp regExp = RegExp(r"^[6-9]\d{9}$");
@@ -64,23 +67,33 @@ class _LoginPageState extends State<LoginPage> {
     if (password.length < 8) return "Minimum password length is 8";
     RegExp regExp = RegExp(
         r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$");
-    if (!regExp.hasMatch(password))
+    if (!regExp.hasMatch(password)) {
       return "Password must contain one number,\none letter and one special character";
+    }
     return null;
   }
 
   Future<void> handleLogin(AuthProvider auth) async {
-    setState(() {
-      isLoggingOrRegistering = true;
-    });
-
-    print(email);
 
     await auth.login(email, password);
 
-    setState(() {
-      isLoggingOrRegistering = false;
-    });
+  }
+
+  //setters
+  void setName (name){
+    this.name = name;
+  }
+
+  void setEmail (email) {
+    this.email = email;
+  }
+
+  void setPassword (password){
+    this.password = password;
+  }
+
+  void setPhoneNo (phoneNo){
+    this.phoneNo = phoneNo;
   }
 
   @override
@@ -91,7 +104,7 @@ class _LoginPageState extends State<LoginPage> {
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.only(top: 50, left: 20, right: 20),
         child: Container(
           height: mediaQuery.height,
           child: Column(
@@ -101,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
               Text(
                 displayText,
                 style: const TextStyle(
+                  // foreground: Paint()..shader = linearGradient,
                   color: Colors.white,
                   fontSize: 55,
                   fontWeight: FontWeight.bold,
@@ -109,77 +123,26 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(
                 height: 60,
               ),
-              Form(
-                key: _form,
-                child: Column(
-                  children: [
-                    if (!login) ...[
-                      TextFormField(
-                        style: whiteTextTheme,
-                        cursorColor: Colors.white,
-                        decoration: getInputDecoration("Enter you name"),
-                        onChanged: (val) {
-                          name = val;
-                        },
-                        validator: (name) {
-                          if (name == null) return "Enter you name";
-                          name = name.trim();
-                          if (name.length < 4) return "Enter a valid name";
-                          return null;
-                        },
-                        initialValue: name,
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                      TextFormField(
-                        style: whiteTextTheme,
-                        cursorColor: Colors.white,
-                        decoration: getInputDecoration("Enter you mobile no"),
-                        onChanged: (val) {
-                          phoneNo = val;
-                        },
-                        validator: mobileNoValidator,
-                        keyboardType: TextInputType.phone,
-                        initialValue: phoneNo,
-                      ),
-                      const SizedBox(
-                        height: 20,
-                      ),
-                    ],
-                    TextFormField(
-                      style: whiteTextTheme,
-                      cursorColor: Colors.white,
-                      decoration: getInputDecoration("Enter you email"),
-                      keyboardType: TextInputType.emailAddress,
-                      onChanged: (val) {
-                        email = val;
-                      },
-                      validator: emailValidator,
-                      initialValue: email,
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    TextFormField(
-                      style: whiteTextTheme,
-                      cursorColor: Colors.white,
-                      decoration: getInputDecoration("Enter you password"),
-                      onChanged: (val) {
-                        password = val;
-                      },
-                      validator: passwordValidator,
-                      initialValue: password,
-                      obscureText: true,
-                      keyboardType: TextInputType.visiblePassword,
-                    ),
-                  ],
+              if (login)
+                LoginForm(
+                  formKey: _form,
+                  emailValidator: emailValidator,
+                  passwordValidator: passwordValidator,
+                  setEmail: setEmail,
+                  setPassword: setPassword,
+                )
+              else
+                RegistrationForm(
+                  formKey: _form,
+                  emailValidator: emailValidator,
+                  passwordValidator: passwordValidator,
+                  phoneNoValidator: phoneNoValidator,
+                  setEmail: setEmail,
+                  setPassword: setPassword,
+                  setName: setName,
+                  setPhoneNo: setPhoneNo,
                 ),
-              ),
-              const SizedBox(
-                height: 60,
-              ),
-              if (isLoggingOrRegistering) ...[
+              if (authProvider.fetchingApi) ...[
                 const Center(
                   child: CircularProgressIndicator(),
                 )
@@ -199,14 +162,14 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 10,
                 ),
                 if (authProvider.error != null)
                   Center(
                     child: Text(
                       authProvider.error.toString(),
-                      style: TextStyle(
+                      style: const TextStyle(
                           color: Colors.redAccent, fontStyle: FontStyle.italic),
                     ),
                   ),
@@ -215,10 +178,12 @@ class _LoginPageState extends State<LoginPage> {
                   child: Center(
                     child: TextButton(
                       onPressed: () => {
-                        setState(() {
-                          login = !login;
-                        }),
-                        changeText()
+                        if(!changingText){
+                          setState(() {
+                            login = !login;
+                          }),
+                          changeText()
+                        }
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -245,6 +210,140 @@ class _LoginPageState extends State<LoginPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class RegistrationForm extends StatelessWidget {
+  final formKey;
+  final emailValidator;
+  final passwordValidator;
+  final phoneNoValidator;
+  final setName;
+  final setEmail;
+  final setPassword;
+  final setPhoneNo;
+  const RegistrationForm({
+    required this.formKey,
+    required this.emailValidator,
+    required this.passwordValidator,
+    required this.phoneNoValidator,
+    required this.setEmail,
+    required this.setName,
+    required this.setPassword,
+    required this.setPhoneNo,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: Column(
+        key: new Key('1'),
+        children: [
+          TextFormField(
+            style: whiteTextTheme,
+            cursorColor: Colors.white,
+            decoration: getInputDecoration("Enter you email"),
+            keyboardType: TextInputType.emailAddress,
+            validator: emailValidator,
+            onChanged: setEmail,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          TextFormField(
+            style: whiteTextTheme,
+            cursorColor: Colors.white,
+            decoration: getInputDecoration("Enter you password"),
+            validator: passwordValidator,
+            obscureText: true,
+            keyboardType: TextInputType.visiblePassword,
+            onChanged: setPassword,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          TextFormField(
+            style: whiteTextTheme,
+            cursorColor: Colors.white,
+            decoration: getInputDecoration("Enter you name"),
+            validator: (name) {
+              if (name == null) return "Enter you name";
+              name = name.trim();
+              if (name.length < 4) return "Enter a valid name";
+              return null;
+            },
+            onChanged: setName,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          TextFormField(
+            style: whiteTextTheme,
+            cursorColor: Colors.white,
+            decoration: getInputDecoration("Enter you mobile no"),
+            validator: phoneNoValidator,
+            keyboardType: TextInputType.phone,
+            onChanged: setPhoneNo,
+          ),
+          const SizedBox(
+            height: 40,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class LoginForm extends StatelessWidget {
+  final formKey;
+  final emailValidator;
+  final passwordValidator;
+  final setPassword;
+  final setEmail;
+  const LoginForm({
+    required this.formKey,
+    required this.emailValidator,
+    required this.passwordValidator,
+    required this.setEmail,
+    required this.setPassword,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: Column(
+        key: new Key('2'),
+        children: [
+          TextFormField(
+            style: whiteTextTheme,
+            cursorColor: Colors.white,
+            decoration: getInputDecoration("Enter you email"),
+            keyboardType: TextInputType.emailAddress,
+            validator: emailValidator,
+            onChanged: setEmail,
+          ),
+          const SizedBox(
+            height: 20,
+          ),
+          TextFormField(
+            style: whiteTextTheme,
+            cursorColor: Colors.white,
+            decoration: getInputDecoration("Enter you password"),
+            validator: passwordValidator,
+            obscureText: true,
+            keyboardType: TextInputType.visiblePassword,
+            onChanged: setPassword,
+          ),
+          const SizedBox(
+            height: 40,
+          ),
+        ],
       ),
     );
   }
