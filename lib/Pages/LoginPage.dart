@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:e_game/konstants/ThemeConstants.dart';
 import 'package:e_game/providers/authProvider.dart';
 import 'package:flutter/material.dart';
@@ -14,28 +12,30 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool login = true;
-  final String loginText = "Let's\nLog you in. ❤ ";
-  final String registerText = "Go ahead,\nCreate an account. ✌ ";
-  String displayText = "Let's\nLog you in. ❤";
+  final String loginText = "Let's\nLog you in. 🌠 ";
+  final String registerText = "Go ahead,\nCreate an account. 🚀 ";
+  String displayText = "Let's\nLog you in. 🌠 ";
 
   String name = "";
   String email = "";
   String phoneNo = "";
   String password = "";
   bool changingText = false;
+  bool isInit = true;
 
   final _form = GlobalKey<FormState>();
 
   changeText() async {
 
     changingText = true;
-    int sz = login ? loginText.length : registerText.length;
+    var dpT = login ? loginText.runes : registerText.runes;
+    String dpTF = String.fromCharCodes(dpT, 0, dpT.length-1);
+    int sz = dpTF.length;
     int ind = 0;
     String text;
 
     while (ind <= sz) {
-      text =
-          login ? loginText.substring(0, ind) : registerText.substring(0, ind);
+      text = dpTF.substring(0, ind);
       await Future.delayed(const Duration(milliseconds: 100));
       setState(() {
         displayText = text;
@@ -74,9 +74,12 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> handleLogin(AuthProvider auth) async {
-
-    await auth.login(email, password);
-
+    print("handle called");
+    if(login) {
+      await auth.login(email: email, password: password);
+    } else {
+      await auth.register(email: email, password: password, phoneNo: phoneNo, username: name);
+    }
   }
 
   //setters
@@ -97,117 +100,143 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void didChangeDependencies() async {
+    //if this page is loaded we fetch event list from firebase
+    if(isInit){
+      //if this is page is loaded for first time we are going to try auto login....
+      AuthProvider authProvider = Provider.of<AuthProvider>(context);
+      await authProvider.tryAutoLogin();
+      isInit = false;
+    }
+    super.didChangeDependencies();
+  }
+
+  @override
   Widget build(BuildContext context) {
     Size mediaQuery = MediaQuery.of(context).size;
     AuthProvider authProvider = Provider.of<AuthProvider>(context);
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      body: SingleChildScrollView(
-        physics: BouncingScrollPhysics(),
-        padding: EdgeInsets.only(top: 50, left: 20, right: 20),
-        child: Container(
-          height: mediaQuery.height,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                displayText,
-                style: const TextStyle(
-                  // foreground: Paint()..shader = linearGradient,
-                  color: Colors.white,
-                  fontSize: 55,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(
-                height: 60,
-              ),
-              if (login)
-                LoginForm(
-                  formKey: _form,
-                  emailValidator: emailValidator,
-                  passwordValidator: passwordValidator,
-                  setEmail: setEmail,
-                  setPassword: setPassword,
-                )
-              else
-                RegistrationForm(
-                  formKey: _form,
-                  emailValidator: emailValidator,
-                  passwordValidator: passwordValidator,
-                  phoneNoValidator: phoneNoValidator,
-                  setEmail: setEmail,
-                  setPassword: setPassword,
-                  setName: setName,
-                  setPhoneNo: setPhoneNo,
-                ),
-              if (authProvider.fetchingApi) ...[
-                const Center(
-                  child: CircularProgressIndicator(),
-                )
-              ] else ...[
-                ElevatedButton(
-                  onPressed: () => {
-                    if (_form.currentState!.validate())
-                      {
-                        if (login) handleLogin(authProvider),
-                      }
-                  },
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: Center(
-                      child: Text(login ? "Login" : "Register"),
-                    ),
+      body: ScrollConfiguration(
+        behavior: MyBehavior(),
+        child: SingleChildScrollView(
+          physics: const ClampingScrollPhysics(),
+          padding: const EdgeInsets.only(top: 50, left: 20, right: 20),
+          child: SizedBox(
+            height: mediaQuery.height-50,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  displayText,
+                  style: const TextStyle(
+                    // foreground: Paint()..shader = linearGradient,
+                    color: Colors.white,
+                    fontSize: 55,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(
-                  height: 10,
-                ),
-                if (authProvider.error != null)
-                  Center(
-                    child: Text(
-                      authProvider.error.toString(),
-                      style: const TextStyle(
-                          color: Colors.redAccent, fontStyle: FontStyle.italic),
-                    ),
-                  ),
                 SizedBox(
-                  width: double.infinity,
-                  child: Center(
-                    child: TextButton(
-                      onPressed: () => {
-                        if(!changingText){
-                          setState(() {
-                            login = !login;
-                          }),
-                          changeText()
+                  height: login ? 50 : 40,
+                ),
+                if (login)
+                  LoginForm(
+                    formKey: _form,
+                    emailValidator: emailValidator,
+                    passwordValidator: passwordValidator,
+                    setEmail: setEmail,
+                    setPassword: setPassword,
+                  )
+                else
+                  RegistrationForm(
+                    formKey: _form,
+                    emailValidator: emailValidator,
+                    passwordValidator: passwordValidator,
+                    phoneNoValidator: phoneNoValidator,
+                    setEmail: setEmail,
+                    setPassword: setPassword,
+                    setName: setName,
+                    setPhoneNo: setPhoneNo,
+                  ),
+                if (authProvider.fetchingApi) ...[
+                  const Center(
+                    child: CircularProgressIndicator(color: primaryColor,),
+                  )
+                ] else ...[
+                  ElevatedButton(
+                    onPressed: () => {
+                      if (_form.currentState!.validate())
+                        {
+                          handleLogin(authProvider),
                         }
-                      },
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            login
-                                ? "Don't have an account ? "
-                                : "Have an account ? ",
-                            style: const TextStyle(color: Colors.white60),
-                          ),
-                          Text(
-                            login ? "Register" : "Login",
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          )
-                        ],
+                    },
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: Center(
+                        child: Text(login ? "Login" : "SignUp"),
                       ),
                     ),
                   ),
-                )
-              ]
-            ],
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  if (authProvider.error != null)
+                    Center(
+                      child: Text(
+                        authProvider.error.toString(),
+                        style: const TextStyle(
+                            color: Colors.redAccent, fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                  if (authProvider.success != null)
+                    Center(
+                      child: Text(
+                        authProvider.success.toString(),
+                        style: const TextStyle(
+                            color: Colors.greenAccent, fontStyle: FontStyle.italic),
+                      ),
+                    ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Center(
+                      child: TextButton(
+                        onPressed: () => {
+                          if(!changingText){
+                            //if we are changing type of event we should also remove error or success
+                            authProvider.success = null,
+                            authProvider.error = null,
+                            setState(() {
+                              login = !login;
+                            }),
+                            changeText()
+                          }
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              login
+                                  ? "Don't have an account ? "
+                                  : "Have an account ? ",
+                              style: const TextStyle(color: Colors.white60),
+                            ),
+                            Text(
+                              login ? "SignUp" : "Login",
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                ]
+              ],
+            ),
           ),
         ),
       ),

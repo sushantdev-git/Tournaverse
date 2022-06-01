@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 const whiteTextTheme = TextStyle(color: Colors.white);
+const whiteTextThemeHeader = TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold);
 
 const primaryColor = Color(0xff543CAF);
 const scaffoldColor = Color(0xff050910);
@@ -35,7 +36,15 @@ InputDecoration getInputDecoration(String label) {
 }
 
 
+
 final Shader linearGradient = const LinearGradient(
   colors: <Color>[Color(0xff8241b8), primaryColor],
 ).createShader(const Rect.fromLTWH(0.0, 0.0, 200.0, 70.0));
 
+class MyBehavior extends ScrollBehavior {
+  @override
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
+  }
+}

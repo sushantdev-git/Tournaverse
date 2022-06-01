@@ -1,6 +1,11 @@
+import 'package:e_game/Pages/LoginPage.dart';
+import 'package:e_game/Pages/Profile.dart';
+import 'package:e_game/konstants/ThemeConstants.dart';
 import 'package:e_game/konstants/constants.dart';
+import 'package:e_game/providers/authProvider.dart';
 import 'package:flutter/material.dart';
 import 'package:e_game/widgets/GameCard.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -10,12 +15,23 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
+  int currPageIndex = 0;
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xff0e182b),
         fixedColor: Colors.white,
+        onTap: (val){
+          setState((){
+            currPageIndex = val;
+          });
+        },
+        currentIndex: currPageIndex,
+        unselectedItemColor: Colors.white30,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
@@ -24,7 +40,7 @@ class _HomePageState extends State<HomePage> {
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(left: 15, right: 15, top: 60),
         physics: const BouncingScrollPhysics(),
-        child: Column(
+        child: currPageIndex == 0 ? Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
@@ -36,13 +52,17 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Container(
                   margin: const EdgeInsets.only(left: 10),
-                  child: const Text(
-                    "Sushant",
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: Consumer<AuthProvider>(
+                    builder: (ctx, _auth, _){
+                      return Text(
+                        "Welcome, ${_auth.username}",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                        ),
+                      );
+                    }
+                  )
                 )
               ],
             ),
@@ -61,7 +81,7 @@ class _HomePageState extends State<HomePage> {
             const GameCard(name: "FreeFire", imageUrl: "assets/images/freeFire.jpg", gType: GameType.freefire,),
             const GameCard(name: "Call of Duty", imageUrl: "assets/images/cod.jpg", gType: GameType.cod,),
           ],
-        ),
+        ) : const ProfilePage(),
       ),
     );
   }

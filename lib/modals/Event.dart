@@ -9,6 +9,8 @@ class Event {
   final List<dynamic> userRegistered;
   final String imageUrl;
   final String eventId;
+  final String? creatorId;
+  final String? creatorName;
 
   const Event( {
     required this.eventId,
@@ -21,5 +23,7 @@ class Event {
     required this.imageUrl,
     required this.totalSlots,
     required this.userRegistered,
+    required this.creatorId,
+    required this.creatorName,
   });
 }
