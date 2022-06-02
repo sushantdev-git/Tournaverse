@@ -1,6 +1,4 @@
-import 'package:e_game/Pages/LoginPage.dart';
 import 'package:e_game/Pages/Profile.dart';
-import 'package:e_game/konstants/ThemeConstants.dart';
 import 'package:e_game/konstants/constants.dart';
 import 'package:e_game/providers/authProvider.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +53,7 @@ class _HomePageState extends State<HomePage> {
                   child: Consumer<AuthProvider>(
                     builder: (ctx, _auth, _){
                       return Text(
-                        "Welcome, ${_auth.username}",
+                        "Welcome, ${_auth.currentUser.name}",
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 22,

@@ -28,7 +28,7 @@ class TextAndIcon extends StatelessWidget {
                 text,
                 softWrap: true,
                 style: const TextStyle(
-                  color: Colors.white70,
+                  color: Colors.white,
                   fontSize: 17,
                 ),
               ),

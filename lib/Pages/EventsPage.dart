@@ -63,20 +63,24 @@ class _EventsPageState extends State<EventsPage> {
     List<Event> eList =
         Provider.of<EventProvider>(context).getEventList(widget.gType);
 
+    print("Event page rebuild called");
+
     return Scaffold(
       floatingActionButton: Consumer<AuthProvider>(
         builder: (context, auth, _) {
-          return (auth.type == UserType.manager || auth.type == UserType.admin)
+          return (auth.currentUser.usertype == UserType.manager ||
+                  auth.currentUser.usertype == UserType.admin)
               ? FloatingActionButton(
                   onPressed: () {
                     showModalBottomSheet(
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        context: context,
-                        builder: (context) => CreateAndUpdateEventForm(
-                              gType: widget.gType,
-                              eventId: null,
-                            ));
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      context: context,
+                      builder: (context) => CreateAndUpdateEventForm(
+                        gType: widget.gType,
+                        eventId: null,
+                      ),
+                    );
                   },
                   backgroundColor: primaryColor,
                   elevation: 10,
@@ -100,13 +104,10 @@ class _EventsPageState extends State<EventsPage> {
               ),
             ),
             flexibleSpace: FlexibleSpaceBar(
-              background: Hero(
-                tag: widget.name,
-                child: Image.asset(widget.imageUrl,
-                    fit: BoxFit.cover,
-                    color: Colors.white.withOpacity(0.5),
-                    colorBlendMode: BlendMode.modulate),
-              ),
+              background: Image.asset(widget.imageUrl,
+                  fit: BoxFit.cover,
+                  color: Colors.white.withOpacity(0.5),
+                  colorBlendMode: BlendMode.modulate),
             ),
           ),
           SliverPadding(

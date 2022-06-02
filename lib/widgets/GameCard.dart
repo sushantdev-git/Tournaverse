@@ -1,4 +1,5 @@
 import 'package:e_game/konstants/constants.dart';
+import 'package:e_game/pageRouterBuilder/CustomPageRouteBuilder.dart';
 import 'package:flutter/material.dart';
 import 'package:e_game/Pages/EventsPage.dart';
 class GameCard extends StatelessWidget {
@@ -12,7 +13,7 @@ class GameCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => {
-        Navigator.of(context).push(MaterialPageRoute(builder: (context) => EventsPage(name: "$name Events", imageUrl: imageUrl, gType: gType,)))
+        Navigator.of(context).push(CustomPageRoute(child: EventsPage(name: "$name Events", imageUrl: imageUrl, gType: gType,)))
       },
       child: Container(
         clipBehavior: Clip.antiAlias,

@@ -26,14 +26,14 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProxyProvider<AuthProvider, EventProvider>(
-          update: (ctx, auth, _) => EventProvider(auth),
+          update: (ctx, auth, eP) => EventProvider(auth, eP!.pubgEventList, eP.freeFireEventList, eP.codEventList),
           create: (BuildContext context) =>
-              EventProvider(Provider.of<AuthProvider>(context, listen: false)),
-        )
+              EventProvider(Provider.of<AuthProvider>(context, listen: false), [], [], []),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Joyes',
+        title: 'Tournaverse',
         theme: ThemeData(
           primaryColor: primaryColor,
           accentColor: Colors.white,

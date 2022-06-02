@@ -19,7 +19,7 @@ class EventProvider extends ChangeNotifier {
 
   final AuthProvider _api;
 
-  EventProvider(this._api);
+  EventProvider(this._api, this.pubgEventList, this.freeFireEventList, this.codEventList);
 
   void setEventList(GameType gType, List<Event> events) {
     if (gType == GameType.battlegound) {
@@ -40,7 +40,7 @@ class EventProvider extends ChangeNotifier {
       return codEventList;
     }
     else{
-      return _api.eventsParticipated;
+      return _api.currentUser.eventsParticipated;
     }
   }
 
@@ -129,8 +129,8 @@ class EventProvider extends ChangeNotifier {
         "winningAmount": winningAmount.toString(),
         "eventTime": datetime.toString(),
         "gameName": gameName,
-        "creatorId": _api.userId,
-        "creatorName": _api.username,
+        "creatorId": _api.currentUser.userId,
+        "creatorName": _api.currentUser.name,
         "eventStatus": eventStatus ? "approved" : "pending",
       },
     );
@@ -141,7 +141,7 @@ class EventProvider extends ChangeNotifier {
   }
 
   bool isParticipated(String eventId, GameType gType){
-    String userId = _api.userId;
+    String userId = _api.currentUser.userId;
     List<Event> eList = getEventList(gType);
     Event event = eList.firstWhere((e) => e.eventId == eventId);
 

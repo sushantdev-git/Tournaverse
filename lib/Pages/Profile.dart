@@ -1,9 +1,12 @@
 import 'package:e_game/Pages/EventsPage.dart';
+import 'package:e_game/Pages/PaymentDetailsPage.dart';
 import 'package:e_game/konstants/ThemeConstants.dart';
 import 'package:e_game/konstants/constants.dart';
+import 'package:e_game/widgets/UserProfileCard.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../pageRouterBuilder/CustomPageRouteBuilder.dart';
 import '../providers/authProvider.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -23,7 +26,7 @@ class ProfilePage extends StatelessWidget {
           height: 30,
         ),
         Text(
-          auth.username,
+          auth.currentUser.name,
           style: const TextStyle(
             color: Colors.white,
             fontSize: 25,
@@ -32,42 +35,42 @@ class ProfilePage extends StatelessWidget {
         const SizedBox(
           height: 20,
         ),
-        Consumer<AuthProvider>(builder: (context, _auth, _) {
-          return _auth.fetchingApi
-              ? const Center(
-                  child: CircularProgressIndicator(
-                    color: primaryColor,
-                  ),
-                )
-              : ElevatedButton(
-                  onPressed: () {
-                    _auth.tryAutoLogin();
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const EventsPage(
-                          imageUrl: "assets/images/cod.jpg",
-                          name: "My Events",
-                          gType: GameType.myEvent,
-                        ),
-                      ),
-                    );
-                  },
-                  child: const SizedBox(
-                    width: double.infinity,
-                    height: 50,
-                    child: Center(
-                      child: Text("My Events"),
-                    ),
-                  ),
-                );
-        }),
+        UserProfileCard(
+          heading: "My Events",
+          subtitle: "See all the events you have participated in",
+          image: "assets/images/events.jpeg",
+          onTap: () {
+            auth.tryAutoLogin();
+            Navigator.of(context).push(
+              CustomPageRoute(
+                child : const EventsPage(
+                  imageUrl: "assets/images/events.jpeg",
+                  name: "My Events",
+                  gType: GameType.myEvent,
+                ),
+              ),
+            );
+          },
+        ),
+        const SizedBox(
+          height: 20,
+        ),
+        UserProfileCard(
+          heading: "My Payments",
+          subtitle: "See you payment history",
+          image: "assets/images/wallet.jpeg",
+          onTap: (){
+            auth.fetchMyPayments();
+            Navigator.of(context).push(CustomPageRoute(child: const PaymentDetailsPage()));
+          },
+        ),
         const SizedBox(
           height: 20,
         ),
         ElevatedButton(
           onPressed: () => {auth.autoLogout()},
           child: const SizedBox(
-            width: double.infinity,
+            width: 100,
             height: 50,
             child: Center(
               child: Text("Logout"),

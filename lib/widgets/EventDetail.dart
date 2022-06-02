@@ -1,5 +1,7 @@
+import 'package:e_game/Pages/UserListPage.dart';
 import 'package:e_game/konstants/ThemeConstants.dart';
 import 'package:e_game/konstants/constants.dart';
+import 'package:e_game/pageRouterBuilder/CustomPageRouteBuilder.dart';
 import 'package:flutter/material.dart';
 import 'package:e_game/widgets/TextAndIcon.dart';
 import 'package:intl/intl.dart';
@@ -19,11 +21,11 @@ class EventDetail extends StatelessWidget {
     Key? key,
   }) : super(key: key);
 
-  bool canRegister(EventProvider eP, Event event){
+  bool canRegister(EventProvider eP, Event event) {
     //this function checking if there is any chance that user can register.
-    if(DateTime.now().compareTo(event.eventTime.subtract(const Duration(hours: 6))) >= 0) return false;
-    if(eP.isParticipated(eventId, gType)) return false;
-    if(event.userRegistered.length >= event.totalSlots) return false;
+    if (DateTime.now().compareTo(event.eventTime.subtract(const Duration(hours: 6))) >= 0) return false;
+    if (eP.isParticipated(eventId, gType)) return false;
+    if (event.userRegistered.length >= event.totalSlots) return false;
     return true;
   }
 
@@ -37,7 +39,7 @@ class EventDetail extends StatelessWidget {
       children: <Widget>[
         TextAndIcon(
           icon: Icons.videogame_asset_outlined,
-          text: "Game - ${event.gameName}",
+          text: "Game - ${event.gameName.toUpperCase()}",
         ),
         TextAndIcon(
           icon: Icons.map,
@@ -67,13 +69,15 @@ class EventDetail extends StatelessWidget {
         ),
         TextAndIcon(
           icon: Icons.calendar_view_day_sharp,
-          text: "Registration Ends At - \n${f.format(event.eventTime.subtract(const Duration(hours: 6)))}",
+          text:
+              "Registration Ends At - \n${f.format(event.eventTime.subtract(const Duration(hours: 6)))}",
         ),
         const SizedBox(
           height: 100,
         ),
         ElevatedButton(
-          onPressed: canRegister(ep, event)? () {
+          onPressed: canRegister(ep, event)
+              ? () {
                   showModalBottomSheet(
                     backgroundColor: scaffoldColor,
                     elevation: 5,
@@ -89,11 +93,40 @@ class EventDetail extends StatelessWidget {
             width: double.infinity,
             height: 50,
             child: Center(
-              child:
-                  Text(ep.isParticipated(eventId, gType) ? "Registered" : "Register"),
+              child: Text(
+                ep.isParticipated(eventId, gType) ? "Registered" : "Register",
+              ),
             ),
           ),
         ),
+        if(ep.isParticipated(eventId, gType)) ...[
+          const SizedBox(height: 20,),
+          ElevatedButton(
+            onPressed: (){
+              Navigator.of(context).push(CustomPageRoute(child: UserListPage(userRegistered: event.userRegistered, gType: gType,)));
+            },
+            child: const SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: Center(
+                child: Text("User List"),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20,),
+          ElevatedButton(
+            onPressed: (){
+
+            },
+            child: const SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: Center(
+                child: Text("Queries"),
+              ),
+            ),
+          ),
+        ]
       ],
     );
   }
@@ -136,40 +169,41 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
             height: 50,
           ),
           Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  TextFormField(
-                    decoration: getInputDecoration(
-                        "Enter you ${gameName(widget.gType)} Id"),
-                    style: whiteTextTheme,
-                    cursorColor: Colors.white,
-                    onChanged: (val) => gameId = val,
+            key: _formKey,
+            child: Column(
+              children: [
+                TextFormField(
+                  decoration: getInputDecoration(
+                      "Enter you ${gameName(widget.gType)} Id"),
+                  style: whiteTextTheme,
+                  cursorColor: Colors.white,
+                  onChanged: (val) => gameId = val,
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                CheckboxListTile(
+                  value: checkboxVal,
+                  onChanged: (val) {
+                    setState(() {
+                      checkboxVal = val!;
+                    });
+                  },
+                  activeColor: primaryColor,
+                  title: const Text(
+                    "I agree to all the rules provide in rules section",
+                    style: TextStyle(color: Colors.white, fontSize: 18),
                   ),
-                  const SizedBox(
-                    height: 30,
+                  subtitle: const Text(
+                    "Please read all the rules before registering for event!!",
+                    style: TextStyle(color: Colors.white60, fontSize: 12),
                   ),
-                  CheckboxListTile(
-                    value: checkboxVal,
-                    onChanged: (val) {
-                      setState(() {
-                        checkboxVal = val!;
-                      });
-                    },
-                    activeColor: primaryColor,
-                    title: const Text(
-                      "I agree to all the rules provide in rules section",
-                      style: TextStyle(color: Colors.white, fontSize: 18),
-                    ),
-                    subtitle: const Text(
-                      "Please read all the rules before registering for event!!",
-                      style: TextStyle(color: Colors.white60, fontSize: 12),
-                    ),
-                    tileColor: Colors.white,
-                    side: const BorderSide(color: Colors.white),
-                  )
-                ],
-              )),
+                  tileColor: Colors.white,
+                  side: const BorderSide(color: Colors.white),
+                )
+              ],
+            ),
+          ),
           const SizedBox(
             height: 80,
           ),
@@ -186,7 +220,6 @@ class _EventRegistrationFormState extends State<EventRegistrationForm> {
                             loading = true;
                           });
                           await widget.onTap(context, gameId);
-                          Navigator.of(this.context).pop();
                         }
                       : null,
                   child: const SizedBox(

@@ -5,44 +5,52 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-class AuthProvider extends ChangeNotifier {
+import '../modals/Payment.dart';
+import '../modals/User.dart';
 
+class AuthProvider extends ChangeNotifier {
   //the auth provider class is managing all the api class and app authorized state
 
-  String username = "";
-  String userId = "";
-  List<Event> eventsParticipated = [];
+  late User currentUser;
+
   String? error;
   String? success;
   bool fetchingApi = true;
-  UserType type = UserType.user;
 
   String baseUrl = "https://e-sports-game.herokuapp.com/";
   final _storage = const FlutterSecureStorage();
   String? accessToken;
 
-
   Future<void> login({required String email, required String password}) async {
     fetchingApi = true;
     notifyListeners();
 
-    var response = await post(endPoint:"auth/login", body: {
-      "email": email,
-      "password": password,
-    }, retry: false);
-
+    var response = await post(
+      endPoint: "auth/login",
+      body: {
+        "email": email,
+        "password": password,
+      },
+      retry: false,
+    );
 
     Map<String, dynamic> data = jsonDecode(response.body);
 
     if (response.statusCode == 200) {
       await _storage.write(key: "refreshToken", value: data["refreshToken"]);
-      username = data["username"];
-      userId = data["userId"];
-      eventsParticipated = cnvResToEvent(data["eventsParticipated"]);
-      error = null;
-      accessToken= data["accessToken"];
-      type = getUserType(data["userType"]);
 
+      currentUser = User(
+        name: data["username"],
+        userId: data["userId"],
+        email: data["email"],
+        phoneNo: data["phoneNo"],
+        eventsParticipated: cnvResToEvent(data["eventsParticipated"]),
+        usertype: getUserType(data["userType"]),
+        myPayments: [],
+      );
+
+      error = null;
+      accessToken = data["accessToken"];
     } else {
       error = data["error"];
     }
@@ -51,7 +59,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<Event> cnvResToEvent(var data){
+  List<Event> cnvResToEvent(var data) {
     List<Event> eList = [];
 
     for (var x in data) {
@@ -72,50 +80,36 @@ class AuthProvider extends ChangeNotifier {
       );
       eList.add(newEvent);
     }
+
+    eList.sort((a, b) => a.eventTime.compareTo(b.eventTime));
     return eList;
   }
 
-  Event getEventById(String? id) {
-    //finding event with given id
-    List<Event> eventList = eventsParticipated;
-    for (Event e in eventList) {
-      if (e.eventId == id) return e;
-    }
-    return Event(
-        eventId: "randomString1233",
-        entryFee: 50,
-        eventName: "Not found event",
-        eventTime: DateTime.now(),
-        gameName: "Battleground",
-        gameMap: "Erangle",
-        gameMode: "FPP",
-        imageUrl:
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTD-_y_GWqOa1xLPPUJKSjQCQ1RZe6KXhsP9g&usqp=CAU",
-        totalSlots: 20,
-        userRegistered: [1, 2, 3],
-        creatorId: "random",
-        creatorName: "random"
-    );
-  }
-
-  Future<void> register ( {required String email, required String password, required String phoneNo, required String username}) async {
+  Future<void> register({
+    required String email,
+    required String password,
+    required String phoneNo,
+    required String username,
+  }) async {
     fetchingApi = true;
     notifyListeners();
 
+    http.Response res = await post(
+        endPoint: "auth/register",
+        body: {
+          "email": email,
+          "password": password,
+          "username": username,
+          "phoneNo": phoneNo,
+        },
+        retry: false,
+    );
 
-    http.Response res = await post(endPoint: "auth/register", body: {
-      "email":email,
-      "password":password,
-      "username":username,
-      "phoneNo":phoneNo,
-    }, retry: false);
+    Map<String, dynamic> data = jsonDecode(res.body);
 
-    Map<String,dynamic> data = jsonDecode(res.body);
-
-    if(res.statusCode == 201){
+    if (res.statusCode == 201) {
       success = data["success"];
-    }
-    else{
+    } else {
       error = data["error"];
     }
 
@@ -124,7 +118,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> tryAutoLogin() async {
-    if(await _storage.containsKey(key: "refreshToken") == false) {
+    if (await _storage.containsKey(key: "refreshToken") == false) {
       fetchingApi = false;
       notifyListeners();
       return;
@@ -139,16 +133,21 @@ class AuthProvider extends ChangeNotifier {
 
     Map<String, dynamic> data = jsonDecode(response.body);
 
-    if(response.statusCode == 200){
-      await _storage.write(key: "refreshToken", value: data["refreshToken"]);
-      username = data["username"];
-      userId = data["userId"];
-      eventsParticipated = cnvResToEvent(data["eventsParticipated"]);
+    if (response.statusCode == 200) {
+      currentUser = User(
+        name: data["username"],
+        userId: data["userId"],
+        email: data["email"],
+        phoneNo: data["phoneNo"],
+        eventsParticipated: cnvResToEvent(data["eventsParticipated"]),
+        usertype: getUserType(data["userType"]),
+        myPayments: [],
+      );
       error = null;
       accessToken = data["accessToken"];
-      type = getUserType(data["userType"]);
-    }
-    else{
+    } else if (response.statusCode == 403 || response.statusCode == 404) {
+      autoLogout();
+    } else {
       error = data["error"];
     }
 
@@ -156,8 +155,42 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> fetchMyPayments() async {
+    fetchingApi = true;
+    notifyListeners();
 
-  Future<http.Response> get({required String endPoint, bool retry = false}) async {
+    var response = await post(endPoint: 'payment/myPayments', body: {
+      "userId": currentUser.userId,
+    });
+
+    print(response.statusCode);
+    List<dynamic> data = jsonDecode(response.body);
+    print(data);
+
+    if (response.statusCode == 200) {
+      List<Payment> pList = [];
+
+      for (var ele in data) {
+        Payment p = Payment(
+          id: ele["_id"],
+          createdAt: DateTime.parse(ele["created_at"]),
+          status: ele["status"],
+          amount: ele["amount"],
+          eventName: ele["event"]["eventName"],
+        );
+        pList.add(p);
+      }
+
+      currentUser.myPayments = pList;
+    }
+    fetchingApi = false;
+    notifyListeners();
+  }
+
+  Future<http.Response> get({
+    required String endPoint,
+    bool retry = false,
+  }) async {
     var response = await http.get(
       Uri.parse(baseUrl + endPoint),
       headers: {"Authorization": "Bearer $accessToken"},
@@ -167,7 +200,7 @@ class AuthProvider extends ChangeNotifier {
       //if user is un authorized we have to refresh the access token
       http.Response res = await fetchAccessToken();
       if (res.statusCode == 200 && retry == false) {
-        return await get(endPoint : endPoint,  retry: true);
+        return await get(endPoint: endPoint, retry: true);
       } else {
         error = jsonDecode(res.body)["error"];
       }
@@ -176,8 +209,11 @@ class AuthProvider extends ChangeNotifier {
     return response;
   }
 
-  Future<http.Response> post({required String endPoint, required Map<String, dynamic> body,  bool retry = false }) async {
-
+  Future<http.Response> post({
+    required String endPoint,
+    required Map<String, dynamic> body,
+    bool retry = false,
+  }) async {
     var response = await http.post(
       Uri.parse(baseUrl + endPoint),
       headers: {"Authorization": "Bearer $accessToken"},
@@ -213,13 +249,13 @@ class AuthProvider extends ChangeNotifier {
       Map<String, dynamic> data = jsonDecode(response.body);
       accessToken = data["accessToken"];
     }
-    if(response.statusCode == 403) {
+    if (response.statusCode == 403) {
       autoLogout();
     }
     return response;
   }
 
-  void autoLogout(){
+  void autoLogout() {
     accessToken = null;
     _storage.deleteAll();
     notifyListeners();

@@ -1,10 +1,10 @@
 import 'package:e_game/Pages/EventDetailsPage.dart';
 import 'package:e_game/konstants/ThemeConstants.dart';
 import 'package:e_game/konstants/constants.dart';
+import 'package:e_game/pageRouterBuilder/CustomPageRouteBuilder.dart';
 import 'package:e_game/providers/authProvider.dart';
 import 'package:e_game/providers/eventProvider.dart';
 import 'package:e_game/widgets/TextAndIcon.dart';
-import 'package:e_game/widgets/createAndUpdateEvent.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -24,8 +24,8 @@ class EventCard extends StatelessWidget {
     return GestureDetector(
       onTap: () => {
         Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => EventsDetailsPage(
+          CustomPageRoute(
+            child: EventsDetailsPage(
               eventId: eventId,
               gType: gType,
             ),
@@ -46,14 +46,11 @@ class EventCard extends StatelessWidget {
             SizedBox(
               width: double.infinity,
               height: 215,
-              child: Hero(
-                tag: event.eventId,
-                child: Image.network(
-                  event.imageUrl,
-                  fit: BoxFit.cover,
-                  color: Colors.white.withOpacity(0.4),
-                  colorBlendMode: BlendMode.modulate,
-                ),
+              child: Image.network(
+                event.imageUrl,
+                fit: BoxFit.cover,
+                color: Colors.white.withOpacity(0.4),
+                colorBlendMode: BlendMode.modulate,
               ),
             ),
             Container(

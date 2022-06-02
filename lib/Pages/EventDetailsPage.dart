@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:e_game/Pages/PaymentDetailsPage.dart';
 import 'package:e_game/konstants/ThemeConstants.dart';
 import 'package:e_game/konstants/constants.dart';
 import 'package:e_game/providers/authProvider.dart';
@@ -8,6 +9,7 @@ import 'package:e_game/widgets/GameRules.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../pageRouterBuilder/CustomPageRouteBuilder.dart';
 import '../providers/eventProvider.dart';
 import 'package:e_game/modals/Event.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -38,6 +40,13 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
 
   void _handlePaymentSuccess(PaymentSuccessResponse response)  async {
 
+    Provider.of<AuthProvider>(context, listen: false).fetchMyPayments();
+    Provider.of<EventProvider>(context, listen: false).fetchEventList(widget.gType);
+
+    await Future.delayed(const Duration(milliseconds: 500));
+    Navigator.of(context).push(CustomPageRoute(child: const PaymentDetailsPage()));
+
+    await Future.delayed(const Duration(seconds: 3));
     await Fluttertoast.showToast(
         toastLength: Toast.LENGTH_LONG,
         msg: "SUCCESS: We are verifying payment on our side!!", timeInSecForIosWeb: 4,
@@ -49,7 +58,7 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
 
     await Fluttertoast.showToast(
         toastLength: Toast.LENGTH_LONG,
-        msg: "Once it's completed this event will be available in My Event section of profile.", timeInSecForIosWeb: 4,
+        msg: "Once it's completed, this event will be available in My Event section of profile page.", timeInSecForIosWeb: 10,
         gravity: ToastGravity.BOTTOM,
         backgroundColor: Colors.greenAccent,
         textColor: Colors.white,
@@ -68,16 +77,16 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
         fontSize: 16.0
     );
   }
-  void handlePaymentExternalWallet(){
+
+  void handlePaymentExternalWallet() async {
     print("This is coming from razorpay success");
   }
 
   Future<void> openCheckout(context, String gameId) async {
 
-    print("open checkout called");
     AuthProvider auth = Provider.of<AuthProvider>(context, listen: false);
     var order = await auth.post(endPoint: "eventRegister/createOrder", body: {
-      "userId": auth.userId,
+      "userId": auth.currentUser.userId,
       "eventId" : widget.eventId,
     });
 
@@ -103,6 +112,7 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
 
     try{
         razorpay.open(options);
+        Navigator.of(context).pop();
     }
     catch(err){
       print(err.toString());
@@ -139,13 +149,10 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
                     style: const TextStyle(fontSize: 20),
                   ),
                   flexibleSpace: FlexibleSpaceBar(
-                    background: Hero(
-                      tag: event.eventId,
-                      child: Image.network(event.imageUrl,
-                          fit: BoxFit.cover,
-                          color: Colors.white.withOpacity(0.3),
-                          colorBlendMode: BlendMode.modulate),
-                    ),
+                    background: Image.network(event.imageUrl,
+                        fit: BoxFit.cover,
+                        color: Colors.white.withOpacity(0.3),
+                        colorBlendMode: BlendMode.modulate),
                   ),
                   bottom: const TabBar(
                     indicatorColor: primaryColor,
@@ -184,7 +191,7 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
                         SliverPadding(
                             padding: const EdgeInsets.all(20),
                           sliver: SliverFixedExtentList(
-                            itemExtent: name == "Details" ? 500 : name == "Rules" ? 1600 : 1600,
+                            itemExtent: name == "Details" ? 600 : name == "Rules" ? 1600 : 1600,
                             delegate: SliverChildListDelegate(
                               [
                                 if(name == "Details") EventDetail(eventId: widget.eventId,gType: widget.gType, onTap: openCheckout),

@@ -12,9 +12,9 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool login = true;
-  final String loginText = "Let's\nLog you in. 🌠 ";
-  final String registerText = "Go ahead,\nCreate an account. 🚀 ";
-  String displayText = "Let's\nLog you in. 🌠 ";
+  final String loginText = "Let's\nLog you in. ";
+  final String registerText = "Go ahead,\nCreate an account. ";
+  String displayText = "Let's\nLog you in. ";
 
   String name = "";
   String email = "";
@@ -74,7 +74,6 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> handleLogin(AuthProvider auth) async {
-    print("handle called");
     if(login) {
       await auth.login(email: email, password: password);
     } else {
