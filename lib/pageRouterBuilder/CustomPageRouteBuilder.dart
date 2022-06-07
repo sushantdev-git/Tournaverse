@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class CustomPageRoute extends PageRouteBuilder{
   final Widget child;
   CustomPageRoute({required this.child}) : super(

@@ -45,18 +45,19 @@ class _UserListPageState extends State<UserListPage> {
               TextField(
                 onChanged: filterList,
                 decoration: InputDecoration(
-                  labelText: 'Search User Game Id',
+                  hintText: "Enter User Game Id",
                   suffixIcon: const Icon(Icons.search, color: Colors.white,),
-                  labelStyle: const TextStyle(color: Colors.white60),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide:
-                    const BorderSide(color: Colors.white, width: 1, style: BorderStyle.solid),
-                    borderRadius: BorderRadius.circular(10),
+                  fillColor: const Color(0xff111928),
+                  filled: true,
+                  hintStyle: const TextStyle(color: Colors.white60),
+                  contentPadding: const EdgeInsets.all(20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(width: 0),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderSide:
-                    const BorderSide(color: Color(0xff543CAF), width: 3, style: BorderStyle.solid),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(30),
+                    borderSide: const BorderSide(width: 0),
                   ),
                 ),
                 style: const TextStyle(color: Colors.white),

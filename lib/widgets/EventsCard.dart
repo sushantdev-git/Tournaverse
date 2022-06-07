@@ -21,96 +21,101 @@ class EventCard extends StatelessWidget {
     final f = DateFormat('dd MMM yyyy, hh:mm a');
     Event event = Provider.of<EventProvider>(context).getEventById(eventId, gType);
     AuthProvider auth = Provider.of<AuthProvider>(context, listen: false);
-    return GestureDetector(
-      onTap: () => {
-        Navigator.of(context).push(
-          CustomPageRoute(
-            child: EventsDetailsPage(
-              eventId: eventId,
-              gType: gType,
-            ),
-          ),
-        )
-      },
-      child: Container(
-        clipBehavior: Clip.antiAlias,
-        height: 215,
-        margin: const EdgeInsets.only(top: 10, bottom: 10),
-        width: double.infinity,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: const Color(0xff0e1f3a),
-        ),
-        child: Stack(
-          children: [
-            SizedBox(
-              width: double.infinity,
-              height: 215,
-              child: Image.network(
-                event.imageUrl,
-                fit: BoxFit.cover,
-                color: Colors.white.withOpacity(0.4),
-                colorBlendMode: BlendMode.modulate,
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    event.eventName,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold),
-                  ),
-                  TextAndIcon(
-                      icon: Icons.access_time_outlined,
-                      text: f.format(event.eventTime)),
-                  TextAndIcon(
-                      icon: Icons.person_rounded,
-                      text:
-                          "${event.userRegistered.length}/${event.totalSlots}"),
-                  TextAndIcon(
-                      icon: Icons.attach_money_outlined,
-                      text: "Entry Fee - ₹${event.entryFee}"),
-                  // Expanded(child: Container()),
-                  // SizedBox(
-                  //   width: double.infinity,
-                  //   child: Row(
-                  //     mainAxisAlignment: MainAxisAlignment.end,
-                  //     children: [
-                  //       if (auth.userId == event.creatorId ||
-                  //           auth.type == UserType.admin)
-                  //         ModifiedIconButton(
-                  //           onPress: () {
-                  //             showModalBottomSheet(
-                  //               isScrollControlled: true,
-                  //               backgroundColor: Colors.transparent,
-                  //               context: context,
-                  //               builder: (context) {
-                  //                 return CreateAndUpdateEventForm(
-                  //                   gType: gType,
-                  //                   eventId: event.eventId,
-                  //                 );
-                  //               },
-                  //             );
-                  //           },
-                  //           icon: Icons.edit,
-                  //         ),
-                  //       if (auth.type == UserType.admin)
-                  //         ModifiedIconButton(
-                  //           onPress: () {},
-                  //           icon: Icons.delete,
-                  //         ),
-                  //     ],
-                  //   ),
-                  // )
-                ],
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      height: 215,
+      margin: const EdgeInsets.only(top: 10, bottom: 10),
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15),
+        color: const Color(0xff0e1f3a),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          highlightColor: Colors.black12,
+          splashColor: Colors.black26,
+          onTap: () => {
+            Navigator.of(context).push(
+              CustomPageRoute(
+                child: EventsDetailsPage(
+                  eventId: eventId,
+                  gType: gType,
+                ),
               ),
             )
-          ],
+          },
+          child: Stack(
+            children: [
+              SizedBox(
+                width: double.infinity,
+                height: 215,
+                child: Image.network(
+                  event.imageUrl,
+                  fit: BoxFit.cover,
+                  color: Colors.white.withOpacity(0.4),
+                  colorBlendMode: BlendMode.modulate,
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      event.eventName,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    TextAndIcon(
+                        icon: Icons.access_time_outlined,
+                        text: f.format(event.eventTime)),
+                    TextAndIcon(
+                        icon: Icons.person_rounded,
+                        text:
+                            "${event.userRegistered.length}/${event.totalSlots}"),
+                    TextAndIcon(
+                        icon: Icons.attach_money_outlined,
+                        text: "Entry Fee - ₹${event.entryFee}"),
+                    // Expanded(child: Container()),
+                    // SizedBox(
+                    //   width: double.infinity,
+                    //   child: Row(
+                    //     mainAxisAlignment: MainAxisAlignment.end,
+                    //     children: [
+                    //       if (auth.userId == event.creatorId ||
+                    //           auth.type == UserType.admin)
+                    //         ModifiedIconButton(
+                    //           onPress: () {
+                    //             showModalBottomSheet(
+                    //               isScrollControlled: true,
+                    //               backgroundColor: Colors.transparent,
+                    //               context: context,
+                    //               builder: (context) {
+                    //                 return CreateAndUpdateEventForm(
+                    //                   gType: gType,
+                    //                   eventId: event.eventId,
+                    //                 );
+                    //               },
+                    //             );
+                    //           },
+                    //           icon: Icons.edit,
+                    //         ),
+                    //       if (auth.type == UserType.admin)
+                    //         ModifiedIconButton(
+                    //           onPress: () {},
+                    //           icon: Icons.delete,
+                    //         ),
+                    //     ],
+                    //   ),
+                    // )
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

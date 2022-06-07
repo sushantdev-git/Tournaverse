@@ -1,3 +1,4 @@
+import 'package:e_game/Pages/QueriesPage.dart';
 import 'package:e_game/Pages/UserListPage.dart';
 import 'package:e_game/konstants/ThemeConstants.dart';
 import 'package:e_game/konstants/constants.dart';
@@ -116,7 +117,7 @@ class EventDetail extends StatelessWidget {
           const SizedBox(height: 20,),
           ElevatedButton(
             onPressed: (){
-
+              Navigator.of(context).push(CustomPageRoute(child: const QueriesPage()));
             },
             child: const SizedBox(
               width: double.infinity,
