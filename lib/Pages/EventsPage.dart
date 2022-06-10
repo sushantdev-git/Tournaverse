@@ -98,10 +98,7 @@ class _EventsPageState extends State<EventsPage> {
             expandedHeight: 170,
             title: Text(
               widget.name,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: medtext.bodyText1?.copyWith(fontWeight: FontWeight.bold),
             ),
             flexibleSpace: FlexibleSpaceBar(
               background: Image.asset(widget.imageUrl,

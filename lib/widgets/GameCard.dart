@@ -2,12 +2,17 @@ import 'package:e_game/konstants/constants.dart';
 import 'package:e_game/pageRouterBuilder/CustomPageRouteBuilder.dart';
 import 'package:flutter/material.dart';
 import 'package:e_game/Pages/EventsPage.dart';
+
 class GameCard extends StatelessWidget {
   final String name;
   final String imageUrl;
   final GameType gType;
-  const GameCard({required this.name, required this.imageUrl, required this.gType, Key? key}) : super(key: key);
-
+  const GameCard(
+      {required this.name,
+      required this.imageUrl,
+      required this.gType,
+      Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,17 +24,21 @@ class GameCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
-        // color: Colors.greenAccent,
-        image: DecorationImage(
-          image: AssetImage(imageUrl),
-          fit: BoxFit.cover,
-        )
-      ),
+          // color: Colors.greenAccent,
+          image: DecorationImage(
+            image: AssetImage(imageUrl),
+            fit: BoxFit.cover,
+          )),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: () => {
-            Navigator.of(context).push(CustomPageRoute(child: EventsPage(name: "$name Events", imageUrl: imageUrl, gType: gType,)))
+            Navigator.of(context).push(CustomPageRoute(
+                child: EventsPage(
+              name: "$name Events",
+              imageUrl: imageUrl,
+              gType: gType,
+            )))
           },
           splashColor: Colors.black26,
           highlightColor: Colors.black12,

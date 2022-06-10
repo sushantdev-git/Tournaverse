@@ -19,7 +19,8 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final f = DateFormat('dd MMM yyyy, hh:mm a');
-    Event event = Provider.of<EventProvider>(context).getEventById(eventId, gType);
+    Event event =
+        Provider.of<EventProvider>(context).getEventById(eventId, gType);
     AuthProvider auth = Provider.of<AuthProvider>(context, listen: false);
     return Container(
       clipBehavior: Clip.antiAlias,
@@ -62,13 +63,7 @@ class EventCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      event.eventName,
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold),
-                    ),
+                    Text(event.eventName, style: medtext.bodyText1),
                     TextAndIcon(
                         icon: Icons.access_time_outlined,
                         text: f.format(event.eventTime)),
@@ -132,19 +127,19 @@ class ModifiedIconButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-        onPressed: () => onPress(),
-        icon: Container(
-          height: 40,
-          width: 40,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Icon(
-            icon,
-            color: primaryColor,
-          ),
+      onPressed: () => onPress(),
+      icon: Container(
+        height: 40,
+        width: 40,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(10),
         ),
+        child: Icon(
+          icon,
+          color: primaryColor,
+        ),
+      ),
     );
   }
 }
