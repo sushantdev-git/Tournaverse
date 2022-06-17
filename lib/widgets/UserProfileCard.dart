@@ -1,3 +1,4 @@
+import 'package:e_game/konstants/ThemeConstants.dart';
 import 'package:flutter/material.dart';
 
 class UserProfileCard extends StatelessWidget {
@@ -9,7 +10,7 @@ class UserProfileCard extends StatelessWidget {
       {required this.heading,
       required this.subtitle,
       required this.onTap,
-        required this.image,
+      required this.image,
       Key? key})
       : super(key: key);
 
@@ -41,20 +42,13 @@ class UserProfileCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(heading,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 25,
-                        )),
+                    Text(heading, style: textthemedata.bodyText1),
                     const SizedBox(
                       height: 10,
                     ),
                     Text(
                       subtitle,
-                      style: const TextStyle(
-                        color: Colors.white60,
-                        fontSize: 16,
-                      ),
+                      style: smalltext.bodyText1,
                     )
                   ],
                 ),

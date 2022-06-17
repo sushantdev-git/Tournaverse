@@ -10,8 +10,10 @@ import 'dateTimePicker.dart';
 
 class CreateAndUpdateEventForm extends StatefulWidget {
   final GameType gType;
-  final String ? eventId;
-  const CreateAndUpdateEventForm({required this.gType, required this.eventId, Key? key}) : super(key: key);
+  final String? eventId;
+  const CreateAndUpdateEventForm(
+      {required this.gType, required this.eventId, Key? key})
+      : super(key: key);
 
   @override
   State<CreateAndUpdateEventForm> createState() =>
@@ -36,19 +38,18 @@ class _CreateAndUpdateEventFormState extends State<CreateAndUpdateEventForm> {
 
   //functions
   Future<void> handleCreateEvent(context) async {
-
     EventProvider eP = Provider.of<EventProvider>(context, listen: false);
     int sc = await eP.postNewEvent(
-        eventName: eventName.trim(),
-        gameMap: gameMap.trim(),
-        gameMode: gameMode.trim(),
-        bgImageUrl: bgImageUrl.trim(),
-        totalSlots: int.parse(totalSlots.trim()),
-        entryFee: int.parse(totalSlots.trim()),
-        winningAmount: int.parse(totalSlots.trim()),
-        datetime: dateTime,
-        gameName: getGameName(widget.gType),
-        eventStatus: acceptPayment,
+      eventName: eventName.trim(),
+      gameMap: gameMap.trim(),
+      gameMode: gameMode.trim(),
+      bgImageUrl: bgImageUrl.trim(),
+      totalSlots: int.parse(totalSlots.trim()),
+      entryFee: int.parse(totalSlots.trim()),
+      winningAmount: int.parse(totalSlots.trim()),
+      datetime: dateTime,
+      gameName: getGameName(widget.gType),
+      eventStatus: acceptPayment,
     );
     if (sc == 200) {
       Navigator.of(context).pop();
@@ -57,9 +58,10 @@ class _CreateAndUpdateEventFormState extends State<CreateAndUpdateEventForm> {
   }
 
   @override
-  initState(){
-    if(widget.eventId != null){
-      Event event = Provider.of<EventProvider>(context, listen: false).getEventById(widget.eventId, widget.gType);
+  initState() {
+    if (widget.eventId != null) {
+      Event event = Provider.of<EventProvider>(context, listen: false)
+          .getEventById(widget.eventId, widget.gType);
       eventName = event.eventName;
       gameMap = event.gameMap;
       gameMode = event.gameMode;
@@ -288,7 +290,7 @@ class _CreateAndUpdateEventFormState extends State<CreateAndUpdateEventForm> {
                   height: 30,
                 ),
                 Consumer<EventProvider>(
-                  builder: (context, eventP , _) {
+                  builder: (context, eventP, _) {
                     return eventP.isLoading
                         ? const Center(
                             child: CircularProgressIndicator(

@@ -25,13 +25,7 @@ class ProfilePage extends StatelessWidget {
         const SizedBox(
           height: 30,
         ),
-        Text(
-          auth.currentUser.name,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 25,
-          ),
-        ),
+        Text(auth.currentUser.name, style: textthemedata.bodyText2),
         const SizedBox(
           height: 20,
         ),
@@ -43,7 +37,7 @@ class ProfilePage extends StatelessWidget {
             auth.tryAutoLogin();
             Navigator.of(context).push(
               CustomPageRoute(
-                child : const EventsPage(
+                child: const EventsPage(
                   imageUrl: "assets/images/events.jpeg",
                   name: "My Events",
                   gType: GameType.myEvent,
@@ -59,9 +53,10 @@ class ProfilePage extends StatelessWidget {
           heading: "My Payments",
           subtitle: "See you payment history",
           image: "assets/images/wallet.jpeg",
-          onTap: (){
+          onTap: () {
             auth.fetchMyPayments();
-            Navigator.of(context).push(CustomPageRoute(child: const PaymentDetailsPage()));
+            Navigator.of(context)
+                .push(CustomPageRoute(child: const PaymentDetailsPage()));
           },
         ),
         const SizedBox(
