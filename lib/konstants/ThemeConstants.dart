@@ -25,7 +25,7 @@ TextTheme textthemedata = const TextTheme(
 final themedata1 = ThemeData(
   backgroundColor: const Color(0xff0e182b),
   primaryColor: Colors.white,
-  toggleButtonsTheme: ToggleButtonsThemeData(
+  toggleButtonsTheme: const ToggleButtonsThemeData(
       selectedColor: Colors.white, disabledColor: Colors.white30),
 );
 InputDecoration getInputDecoration(String label) {

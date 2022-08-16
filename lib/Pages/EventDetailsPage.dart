@@ -7,127 +7,99 @@ import 'package:e_game/providers/authProvider.dart';
 import 'package:e_game/widgets/EventDetail.dart';
 import 'package:e_game/widgets/GameRules.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../pageRouterBuilder/CustomPageRouteBuilder.dart';
 import '../providers/eventProvider.dart';
 import 'package:e_game/modals/Event.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:paytm_allinonesdk/paytm_allinonesdk.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-
 
 class EventsDetailsPage extends StatefulWidget {
   final String eventId;
   final GameType gType;
-  const EventsDetailsPage({required this.eventId, required this.gType, Key? key}) : super(key: key);
+  const EventsDetailsPage(
+      {required this.eventId, required this.gType, Key? key})
+      : super(key: key);
 
   @override
   State<EventsDetailsPage> createState() => _EventsDetailsPageState();
 }
 
 class _EventsDetailsPageState extends State<EventsDetailsPage> {
-
-  late Razorpay razorpay;
-
-  @override
-  void initState(){
-    super.initState();
-    razorpay = Razorpay();
-    razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentError);
-    razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, handlePaymentExternalWallet);
-  }
-
-  void _handlePaymentSuccess(PaymentSuccessResponse response)  async {
-
-    Provider.of<AuthProvider>(context, listen: false).fetchMyPayments();
-    Provider.of<EventProvider>(context, listen: false).fetchEventList(widget.gType);
-
-    await Future.delayed(const Duration(milliseconds: 500));
-    Navigator.of(context).push(CustomPageRoute(child: const PaymentDetailsPage()));
-
-    await Future.delayed(const Duration(seconds: 3));
-    await Fluttertoast.showToast(
-        toastLength: Toast.LENGTH_LONG,
-        msg: "SUCCESS: We are verifying payment on our side!!", timeInSecForIosWeb: 4,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.greenAccent,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
-
-    await Fluttertoast.showToast(
-        toastLength: Toast.LENGTH_LONG,
-        msg: "Once it's completed, this event will be available in My Event section of profile page.", timeInSecForIosWeb: 10,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.greenAccent,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
-
-  }
-  void handlePaymentError(PaymentFailureResponse response) async {
-    Fluttertoast.showToast(
-        msg: "Payment failed",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-        fontSize: 16.0
-    );
-  }
-
-  void handlePaymentExternalWallet() async {
-    print("This is coming from razorpay success");
-  }
-
   Future<void> openCheckout(context, String gameId) async {
+    print("open checkout called");
 
     AuthProvider auth = Provider.of<AuthProvider>(context, listen: false);
-    var order = await auth.post(endPoint: "eventRegister/createOrder", body: {
-      "userId": auth.currentUser.userId,
-      "eventId" : widget.eventId,
-    });
-
-    Event event = Provider.of<EventProvider>(context, listen: false).getEventById(widget.eventId, widget.gType);
-
-    var data = jsonDecode(order.body);
-
-    data["notes"]["gameId"] = gameId;
-
-    var options = {
-      "key":"rzp_test_HlZrWo63cVl1iO",
-      "amount": data["amount"],
-      "name":"Tourney",
-      "description": "paying for event ${event.eventName} , ${event.eventId}",
-      "order_id": data["id"],
-      "currency" : data["currency"],
-      "prefill":{
-        "contact":"1234567891",
-        "email":"random@gmail.com",
+    var order = await auth.post(
+      endPoint: "eventRegister/createOrder",
+      body: {
+        "userId": auth.currentUser.userId,
+        "eventId": widget.eventId,
+        "gameId": gameId,
       },
-      "notes": data["notes"],
-    };
+      retry: false,
+      url: "https://f554-2409-4055-187-5b7a-8d45-9e00-ff60-5fc8.in.ngrok.io/",
+    );
 
-    try{
-        razorpay.open(options);
-        Navigator.of(context).pop();
-    }
-    catch(err){
-      print(err.toString());
-    }
+    Event event = Provider.of<EventProvider>(context, listen: false)
+        .getEventById(widget.eventId, widget.gType);
+
+    var orderData = jsonDecode(order.body);
+
+    print(orderData);
+
+    var mid = "PtiTgG55971042373145";
+    showToast("Transaction Started....");
+
+    var response = AllInOneSdk.startTransaction(
+      mid,
+      orderData["orderId"],
+      orderData["amount"].toString(),
+      orderData["txnToken"],
+      "https://f554-2409-4055-187-5b7a-8d45-9e00-ff60-5fc8.in.ngrok.io/paytmPayment/verifyPayment",
+      true,
+      true,
+    );
+    response.then((value) async {
+      print(value);
+      Navigator.of(context)
+          .push(CustomPageRoute(child: const PaymentDetailsPage()));
+      await showToast(
+          "Hey payment is completed on your side, We are verifying payment on our side.");
+      await showToast("Please check after sometime in MyPayments page");
+    }).catchError((onError) async {
+      print("payment not completed some error");
+      if (onError is PlatformException) {
+        print(onError.toString());
+      } else {
+        print(onError.toString());
+      }
+      print("showing flutter toast");
+      await showToast("Payment Failed, Please try again.");
+    }).then((value) => Navigator.of(context).pop());
+  }
+
+  Future<void> showToast(String msg) async {
+    await Fluttertoast.showToast(
+      msg: msg,
+      timeInSecForIosWeb: 5,
+      toastLength: Toast.LENGTH_LONG,
+      backgroundColor: Colors.orange,
+      fontSize: 16,
+    );
   }
 
   @override
-  dispose(){
+  dispose() {
     super.dispose();
-    razorpay.clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    Event event = Provider.of<EventProvider>(context).getEventById(widget.eventId, widget.gType);
+    Event event = Provider.of<EventProvider>(context)
+        .getEventById(widget.eventId, widget.gType);
     List<String> tabName = ["Details", "Rules", "Updates"];
 
     return DefaultTabController(
@@ -190,17 +162,22 @@ class _EventsDetailsPageState extends State<EventsDetailsPage> {
                         ),
                         SliverPadding(
                             padding: const EdgeInsets.all(20),
-                          sliver: SliverFixedExtentList(
-                            itemExtent: name == "Details" ? 600 : name == "Rules" ? 1600 : 1600,
-                            delegate: SliverChildListDelegate(
-                              [
-                                if(name == "Details") EventDetail(eventId: widget.eventId,gType: widget.gType, onTap: openCheckout),
-                                if(name == "Rules") const GameRules(),
-                                if(name == "Updates") const GameRules()
-                              ]
-                            ),
-                          )
-                        )
+                            sliver: SliverFixedExtentList(
+                              itemExtent: name == "Details"
+                                  ? 600
+                                  : name == "Rules"
+                                      ? 1600
+                                      : 1600,
+                              delegate: SliverChildListDelegate([
+                                if (name == "Details")
+                                  EventDetail(
+                                      eventId: widget.eventId,
+                                      gType: widget.gType,
+                                      onTap: openCheckout),
+                                if (name == "Rules") const GameRules(),
+                                if (name == "Updates") const GameRules()
+                              ]),
+                            ))
                       ],
                     );
                   },

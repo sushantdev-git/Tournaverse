@@ -213,9 +213,10 @@ class AuthProvider extends ChangeNotifier {
     required String endPoint,
     required Map<String, dynamic> body,
     bool retry = false,
+    String ? url,
   }) async {
     var response = await http.post(
-      Uri.parse(baseUrl + endPoint),
+      Uri.parse("${url ?? baseUrl}$endPoint"),
       headers: {"Authorization": "Bearer $accessToken"},
       body: body,
     );
